@@ -1,0 +1,62 @@
+import logging
+import os
+from typing import Optional
+
+import aiohttp
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
+TON_WALLET = os.getenv("TON_WALLET", "")
+TON_EXPLORER_API = "https://tonapi.io/v2/blockchain/accounts/{wallet}/transactions?limit=20"
+
+MONTHLY_TON = 5
+PER_GEN_TON = 0.5
+NANO = 1_000_000_000  # 1 TON in nano
+
+
+def payment_keyboard() -> InlineKeyboardMarkup:
+    monthly_url = f"https://tonhub.com/transfer/{TON_WALLET}?amount={int(MONTHLY_TON * NANO)}&text=KittyKodakAI%20Pro"
+    per_gen_url = f"https://tonhub.com/transfer/{TON_WALLET}?amount={int(PER_GEN_TON * NANO)}&text=KittyKodakAI%20One%20Gen"
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="Buy Pro 5 TON / month", url=monthly_url),
+                InlineKeyboardButton(text="Pay 0.5 TON / gen", url=per_gen_url),
+            ],
+            [
+                InlineKeyboardButton(text="I paid 5 TON (Pro)", callback_data="check_monthly"),
+                InlineKeyboardButton(text="I paid 0.5 TON (1 gen)", callback_data="check_one"),
+            ],
+        ]
+    )
+
+
+async def _fetch_transactions(wallet: str) -> Optional[list]:
+    if not wallet:
+        return None
+    url = TON_EXPLORER_API.format(wallet=wallet)
+    try:
+        async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=15)) as session:
+            async with session.get(url) as resp:
+                if resp.status != 200:
+                    logging.error("TON API error %s: %s", resp.status, await resp.text())
+                    return None
+                data = await resp.json()
+                return data.get("transactions", [])
+    except Exception as exc:  # pragma: no cover - network best effort
+        logging.exception("TON explorer call failed: %s", exc)
+        return None
+
+
+async def verify_payment(min_ton: float) -> bool:
+    """Check recent inbound transactions for the expected amount."""
+    txs = await _fetch_transactions(TON_WALLET)
+    if not txs:
+        return False
+    required = int(min_ton * NANO)
+    for tx in txs:
+        in_msg = tx.get("in_msg") or {}
+        value = int(in_msg.get("value", 0))
+        is_incoming = in_msg.get("destination", "").lower() == TON_WALLET.lower()
+        if is_incoming and value >= required:
+            return True
+    return False
