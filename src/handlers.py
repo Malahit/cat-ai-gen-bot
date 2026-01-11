@@ -17,7 +17,7 @@ PERPLEXITY_KEY = os.getenv("PERPLEXITY_KEY", "")
 
 async def _send_cat_photo(message: types.Message, image_bytes: Optional[bytes]) -> None:
     if not image_bytes:
-        await message.answer("Generation failed. Please /retry or try again later.")
+        await message.answer("Generation failed. Please try again in a moment.")
         return
     photo = BufferedInputFile(file=image_bytes, filename="kitty.png")
     await message.answer_photo(

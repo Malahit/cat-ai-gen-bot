@@ -76,7 +76,13 @@ async def verify_payment(min_ton: float) -> bool:
         in_msg = tx.get("in_msg") or {}
         value = int(in_msg.get("value", 0))
         destination = in_msg.get("destination", "")
-        is_incoming = destination and destination.lower() == WALLET_B64.lower()
+        normalized_dest = destination
+        if prepare_address and destination:
+            try:
+                normalized_dest = prepare_address(destination)
+            except Exception:  # pragma: no cover
+                normalized_dest = destination
+        is_incoming = normalized_dest and normalized_dest.lower() == WALLET_B64.lower()
         if is_incoming and value >= required:
             return True
     return False

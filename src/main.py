@@ -1,4 +1,3 @@
-import asyncio
 import logging
 import os
 
@@ -72,9 +71,8 @@ async def init_app() -> web.Application:
 
 
 def main() -> None:
-    app = asyncio.run(init_app())
     port = int(os.getenv("PORT", "8080"))
-    web.run_app(app, host="0.0.0.0", port=port)
+    web.run_app(init_app(), host="0.0.0.0", port=port)
 
 
 if __name__ == "__main__":

@@ -66,7 +66,9 @@ async def generate_cat_image(perplexity_key: str, prompt: str) -> Optional[bytes
                 try:
                     return base64.b64decode(content, validate=True)
                 except Exception:
-                    logging.warning("Failed to decode Perplexity response, falling back.")
+                    logging.warning(
+                        "Perplexity response was not base64 (model is text-first); using placeholder cat."
+                    )
                     return await _fetch_placeholder_cat()
     except asyncio.TimeoutError:
         logging.error("Perplexity request timed out")

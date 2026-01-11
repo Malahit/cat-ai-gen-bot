@@ -55,6 +55,8 @@ class Database:
         if not pro_until:
             return False
         until_dt = datetime.fromisoformat(pro_until)
+        if until_dt.tzinfo is None:
+            until_dt = until_dt.replace(tzinfo=timezone.utc)
         return until_dt > datetime.now(timezone.utc)
 
     async def can_generate(self, user_id: int) -> bool:
