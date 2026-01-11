@@ -42,7 +42,7 @@ async def cmd_cat(message: types.Message, command: CommandObject, db: Database) 
         await message.answer("Send like: /cat astronaut cat sipping coffee.")
         return
     if not PERPLEXITY_KEY:
-        await message.answer("Perplexity key missing. Please set PERPLEXITY_KEY.")
+        await message.answer("Generator is temporarily unavailable. Please try again later.")
         return
     can_generate = await db.can_generate(message.from_user.id)
     if not can_generate:

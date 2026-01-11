@@ -3,7 +3,10 @@ import os
 
 from aiohttp import web
 from aiogram import Bot, Dispatcher
-from aiogram import BaseMiddleware
+try:
+    from aiogram import BaseMiddleware
+except ImportError:  # pragma: no cover - fallback for future aiogram changes
+    from aiogram.dispatcher.middlewares.base import BaseMiddleware
 from aiogram.fsm.storage.redis import RedisStorage
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 from dotenv import load_dotenv

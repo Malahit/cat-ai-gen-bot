@@ -57,7 +57,10 @@ class Database:
         try:
             until_dt = datetime.fromisoformat(pro_until)
         except ValueError:
-            return False
+            try:
+                until_dt = datetime.fromisoformat(pro_until.replace("Z", "+00:00"))
+            except Exception:
+                return False
         if until_dt.tzinfo is None:
             until_dt = until_dt.replace(tzinfo=timezone.utc)
         return until_dt > datetime.now(timezone.utc)
@@ -91,7 +94,10 @@ class Database:
                     if current_until.tzinfo is None:
                         current_until = current_until.replace(tzinfo=timezone.utc)
                 except ValueError:
-                    current_until = now
+                    try:
+                        current_until = datetime.fromisoformat(data["pro_until"].replace("Z", "+00:00"))
+                    except Exception:
+                        current_until = now
             new_until = max(now, current_until) + timedelta(days=days)
             data["pro_until"] = new_until.isoformat()
             await self._save(user_id, data)

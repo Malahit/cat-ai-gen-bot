@@ -68,6 +68,8 @@ async def _fetch_transactions(wallet: str) -> Optional[list]:
 
 async def verify_payment(min_ton: float) -> bool:
     """Check recent inbound transactions for the expected amount."""
+    if not WALLET_B64:
+        return False
     txs = await _fetch_transactions(WALLET_B64)
     if not txs:
         return False
