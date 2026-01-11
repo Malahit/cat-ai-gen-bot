@@ -46,7 +46,7 @@ async def on_shutdown(bot: Bot) -> None:
     logger.info("Webhook deleted")
 
 
-async def init_app() -> web.Application:
+def init_app() -> web.Application:
     if not BOT_TOKEN:
         raise RuntimeError("BOT_TOKEN is required")
     if not REDIS_URL:

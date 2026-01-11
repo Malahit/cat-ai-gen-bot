@@ -74,7 +74,10 @@ async def verify_payment(min_ton: float) -> bool:
     required = int(min_ton * NANO)
     for tx in txs:
         in_msg = tx.get("in_msg") or {}
-        value = int(in_msg.get("value", 0))
+        try:
+            value = int(in_msg.get("value", 0))
+        except (TypeError, ValueError):
+            continue
         destination = in_msg.get("destination", "")
         normalized_dest = destination
         if prepare_address and destination:
