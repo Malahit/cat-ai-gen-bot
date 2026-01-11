@@ -1,0 +1,6 @@
+aiogram==3.13.1
+perplexity-ai
+redis
+pytonlib
+aiohttp
+python-dotenv
