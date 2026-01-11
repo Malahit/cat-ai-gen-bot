@@ -84,7 +84,14 @@ class Database:
         async with self._lock:
             data = await self.ensure_daily_reset(user_id)
             now = datetime.now(timezone.utc)
-            current_until = datetime.fromisoformat(data.get("pro_until")) if data.get("pro_until") else now
+            current_until = now
+            if data.get("pro_until"):
+                try:
+                    current_until = datetime.fromisoformat(data["pro_until"])
+                    if current_until.tzinfo is None:
+                        current_until = current_until.replace(tzinfo=timezone.utc)
+                except ValueError:
+                    current_until = now
             new_until = max(now, current_until) + timedelta(days=days)
             data["pro_until"] = new_until.isoformat()
             await self._save(user_id, data)
