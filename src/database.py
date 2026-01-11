@@ -54,7 +54,10 @@ class Database:
         pro_until = data.get("pro_until")
         if not pro_until:
             return False
-        until_dt = datetime.fromisoformat(pro_until)
+        try:
+            until_dt = datetime.fromisoformat(pro_until)
+        except ValueError:
+            return False
         if until_dt.tzinfo is None:
             until_dt = until_dt.replace(tzinfo=timezone.utc)
         return until_dt > datetime.now(timezone.utc)
