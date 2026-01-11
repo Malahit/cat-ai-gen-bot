@@ -25,8 +25,8 @@ async def generate_cat_image(perplexity_key: str, prompt: str) -> Optional[bytes
     """
     Call Perplexity API to generate a vibrant cat image.
 
-    The model is text-first, so we request a base64 encoded PNG response
-    we can send to Telegram. If decoding fails, we use a placeholder cat.
+    The sonar-pro model is text-first; we request a base64 encoded PNG
+    string and gracefully fall back to a placeholder cat if decoding fails.
     """
     headers = {
         "Content-Type": "application/json",

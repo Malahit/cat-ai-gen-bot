@@ -5,6 +5,11 @@ from typing import Optional
 import aiohttp
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
+try:
+    from pytonlib.utils.address import prepare_address
+except Exception:  # pragma: no cover - optional dependency handling
+    prepare_address = None
+
 TON_WALLET = os.getenv("TON_WALLET", "")
 TON_EXPLORER_API = "https://tonapi.io/v2/blockchain/accounts/{wallet}/transactions?limit=20"
 
@@ -13,9 +18,23 @@ PER_GEN_TON = 0.5
 NANO = 1_000_000_000  # 1 TON in nano
 
 
+def _normalized_wallet() -> str:
+    if not TON_WALLET:
+        return ""
+    if prepare_address:
+        try:
+            return prepare_address(TON_WALLET)
+        except Exception as exc:  # pragma: no cover - best effort normalization
+            logging.warning("Wallet normalization failed: %s", exc)
+    return TON_WALLET
+
+
+WALLET_B64 = _normalized_wallet()
+
+
 def payment_keyboard() -> InlineKeyboardMarkup:
-    monthly_url = f"https://tonhub.com/transfer/{TON_WALLET}?amount={int(MONTHLY_TON * NANO)}&text=KittyKodakAI%20Pro"
-    per_gen_url = f"https://tonhub.com/transfer/{TON_WALLET}?amount={int(PER_GEN_TON * NANO)}&text=KittyKodakAI%20One%20Gen"
+    monthly_url = f"https://tonhub.com/transfer/{WALLET_B64}?amount={int(MONTHLY_TON * NANO)}&text=KittyKodakAI%20Pro"
+    per_gen_url = f"https://tonhub.com/transfer/{WALLET_B64}?amount={int(PER_GEN_TON * NANO)}&text=KittyKodakAI%20One%20Gen"
     return InlineKeyboardMarkup(
         inline_keyboard=[
             [
@@ -49,14 +68,15 @@ async def _fetch_transactions(wallet: str) -> Optional[list]:
 
 async def verify_payment(min_ton: float) -> bool:
     """Check recent inbound transactions for the expected amount."""
-    txs = await _fetch_transactions(TON_WALLET)
+    txs = await _fetch_transactions(WALLET_B64)
     if not txs:
         return False
     required = int(min_ton * NANO)
     for tx in txs:
         in_msg = tx.get("in_msg") or {}
         value = int(in_msg.get("value", 0))
-        is_incoming = in_msg.get("destination", "").lower() == TON_WALLET.lower()
+        destination = in_msg.get("destination", "")
+        is_incoming = destination and destination.lower() == WALLET_B64.lower()
         if is_incoming and value >= required:
             return True
     return False
