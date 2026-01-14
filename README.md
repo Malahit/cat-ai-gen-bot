@@ -54,7 +54,8 @@ Procfile
 - `/stats` → Usage info and limits 📊
 
 ## Technologies
-- **aiogram 3.13.1**: Modern Telegram Bot framework
+- **aiogram 3.24+**: Modern Telegram Bot framework with latest features
+- **aiohttp 3.13.3**: Async HTTP client with security patches (zip bomb, DoS, directory traversal CVEs)
 - **Perplexity API**: AI-powered cat image generation
 - **TON Blockchain**: Decentralized payment processing
 - **Redis**: Session storage and rate limiting
