@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 
 from aiohttp import web
 from aiogram import Bot, Dispatcher
@@ -13,8 +14,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from .database import Database
-from .handlers import router
+# Исправление: абсолютные импорты вместо относительных
+from database import Database
+from handlers import router
+
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 WEBHOOK_BASE = os.getenv("WEBHOOK_BASE")
 REDIS_URL = os.getenv("REDIS_URL")
