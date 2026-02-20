@@ -7,8 +7,8 @@ from aiogram.filters import Command, CommandObject
 from aiogram.types import BufferedInputFile, CallbackQuery
 
 from ai_generator import generate_cat_image
-from .database import Database, FREE_LIMIT
-from .ton_payments import MONTHLY_TON, PER_GEN_TON, payment_keyboard, verify_payment
+from database import Database, FREE_LIMIT
+from ton_payments import MONTHLY_TON, PER_GEN_TON, payment_keyboard, verify_payment
 
 router = Router()
 
