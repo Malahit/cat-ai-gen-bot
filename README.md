@@ -33,6 +33,10 @@ python src/main.py
 - Set environment variables in Railway dashboard
 - WEBHOOK_BASE should be your Railway domain (e.g., https://your-app.up.railway.app)
 
+> **Note:** If Railway continues to deploy a stale revision after a PR is merged, trigger a
+> manual redeploy from the Railway dashboard (Deployments → Redeploy) or push a new commit to
+> `main` to force Railway to pick up the latest revision.
+
 ## Folder structure
 ```
 src/
