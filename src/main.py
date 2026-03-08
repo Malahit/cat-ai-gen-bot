@@ -4,6 +4,7 @@ import sys
 
 from aiohttp import web
 from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
 try:
     from aiogram import BaseMiddleware
 except ImportError:  # pragma: no cover - fallback for future aiogram changes
@@ -58,7 +59,10 @@ def init_app() -> web.Application:
     if not REDIS_URL:
         raise RuntimeError("REDIS_URL is required")
 
-    bot = Bot(BOT_TOKEN, parse_mode="HTML")
+    bot = Bot(
+        BOT_TOKEN,
+        default=DefaultBotProperties(parse_mode="HTML"),
+    )
     db = Database(REDIS_URL)
     storage = RedisStorage.from_url(REDIS_URL)
     dp = Dispatcher(storage=storage)
