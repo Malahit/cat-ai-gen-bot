@@ -51,6 +51,7 @@ async def on_startup(bot: Bot) -> None:
 async def on_shutdown(bot: Bot) -> None:
     await bot.delete_webhook(drop_pending_updates=True)
     logger.info("Webhook deleted")
+    await bot.session.close()
 
 
 def init_app() -> web.Application:
