@@ -43,6 +43,11 @@ def get_webhook_url() -> str:
     return WEBHOOK_BASE.rstrip("/") + "/webhook"
 
 
+async def health_handler(request: web.Request) -> web.Response:
+    """Health check endpoint for Railway."""
+    return web.json_response({"status": "ok"})
+
+
 async def on_startup(bot: Bot) -> None:
     await bot.set_webhook(get_webhook_url())
     logger.info("Webhook set to %s", get_webhook_url())
@@ -75,6 +80,7 @@ def init_app() -> web.Application:
     dp.shutdown.register(on_shutdown)
 
     app = web.Application()
+    app.router.add_get("/health", health_handler)
     webhook_path = "/webhook"
     SimpleRequestHandler(dispatcher=dp, bot=bot).register(app, path=webhook_path)
     setup_application(app, dp, bot=bot)
