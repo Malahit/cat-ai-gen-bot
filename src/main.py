@@ -1,13 +1,12 @@
 import logging
 import os
-import sys
 
 from aiohttp import web
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 try:
     from aiogram import BaseMiddleware
-except ImportError:  # pragma: no cover - fallback for future aiogram changes
+except ImportError:
     from aiogram.dispatcher.middlewares.base import BaseMiddleware
 from aiogram.fsm.storage.redis import RedisStorage
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
@@ -15,7 +14,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Исправление: абсолютные импорты вместо относительных
 from database import Database
 from handlers import router
 
@@ -44,18 +42,16 @@ def get_webhook_url() -> str:
 
 
 async def health_handler(request: web.Request) -> web.Response:
-    """Health check endpoint for Railway."""
     return web.json_response({"status": "ok"})
 
 
 async def on_startup(bot: Bot) -> None:
-    await bot.set_webhook(get_webhook_url())
+    await bot.set_webhook(get_webhook_url(), drop_pending_updates=False)
     logger.info("Webhook set to %s", get_webhook_url())
 
 
 async def on_shutdown(bot: Bot) -> None:
-    await bot.delete_webhook(drop_pending_updates=True)
-    logger.info("Webhook deleted")
+    logger.info("Shutting down, keeping webhook active")
     await bot.session.close()
 
 
