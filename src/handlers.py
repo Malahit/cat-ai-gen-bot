@@ -29,7 +29,6 @@ def main_keyboard() -> ReplyKeyboardMarkup:
             [KeyboardButton(text="📊 My Stats"), KeyboardButton(text="❓ Help")],
         ],
         resize_keyboard=True,
-        persistent=True,
     )
 
 
@@ -70,7 +69,7 @@ async def cmd_start(message: types.Message) -> None:
 @router.message(lambda m: m.text == "🐱 Generate Cat")
 async def btn_generate(message: types.Message) -> None:
     await message.answer(
-        "Send me a prompt like:\n"
+        "Send me a prompt:\n"
         "/cat astronaut\n"
         "/cat ninja in the rain\n"
         "/cat sleeping on a cloud"
@@ -104,7 +103,7 @@ async def btn_help(message: types.Message) -> None:
         "🐱 <b>How to use KittyKodakAI:</b>\n\n"
         "1. Tap <b>🐱 Generate Cat</b> and send a prompt\n"
         "2. Or type directly: /cat your prompt\n"
-        "3. Free users get 3 generations/day\n"
+        f"3. Free users get {FREE_LIMIT} generations/day\n"
         "4. Upgrade via <b>💎 Go Pro</b> for unlimited access\n\n"
         "<b>Examples:</b>\n"
         "• /cat samurai at sunset\n"
